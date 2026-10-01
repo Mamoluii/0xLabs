@@ -1,0 +1,8 @@
+# /var/www/config.txt
+DB_HOST     = localhost
+DB_NAME     = 0xlabs_db
+DB_USER     = root
+DB_PASS     = r00tP@ssw0rd!
+SECRET_KEY  = 8f3a9c2d1e7b...
+APP_ENV     = production
+ADMIN_TOKEN = eyJhbGci...truncated

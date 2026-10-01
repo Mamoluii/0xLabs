@@ -1,0 +1,65 @@
+<?php
+include('lab-config.php'); // handles session_start()
+include('db.php');
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if ($current_lab && $current_lab['type'] === 'secure') {
+        // SECURE: prepared statements
+        $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+        $stmt->bind_param("ss", $_POST['username'], $_POST['password']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        // VULNERABLE: SQL injection possible
+        $user = $_POST['username'];
+        $pass = $_POST['password'];
+        $query = "SELECT * FROM users WHERE username = '$user' AND password = '$pass'";
+        $result = mysqli_query($conn, $query);
+    }
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $_SESSION['user'] = $row['username'];
+        header("Location: products.php");
+        exit();
+    } else {
+        $error = "Invalid credentials. Please try again.";
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lumina Store | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Poppins',sans-serif;background:#0f172a;color:#f8fafc;min-height:100vh;display:flex;flex-direction:column;}
+        .page-center{flex:1;display:flex;justify-content:center;align-items:center;}
+        .login-card{background:#1e293b;padding:40px;border-radius:20px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5);width:380px;border:1px solid #334155;}
+        h2{text-align:center;font-size:28px;margin-bottom:30px;color:#38bdf8;}
+        .input-group{margin-bottom:20px;}
+        label{display:block;margin-bottom:8px;font-size:14px;color:#94a3b8;}
+        input{width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0f172a;color:white;transition:.3s;}
+        input:focus{border-color:#38bdf8;outline:none;box-shadow:0 0 0 2px rgba(56,189,248,.2);}
+        button{width:100%;padding:14px;background:#38bdf8;color:#0f172a;border:none;border-radius:12px;font-weight:600;cursor:pointer;transition:.3s;font-size:16px;}
+        button:hover{background:#0ea5e9;transform:translateY(-2px);}
+        .error{color:#f87171;text-align:center;font-size:14px;margin-top:15px;}
+    </style>
+</head>
+<body>
+<?php render_lab_banner(); ?>
+<div class="page-center">
+    <div class="login-card">
+        <h2>Lumina Store</h2>
+        <form method="POST">
+            <div class="input-group"><label>Username</label><input type="text" name="username" placeholder="Enter your username"></div>
+            <div class="input-group"><label>Password</label><input type="password" name="password" placeholder="••••••••"></div>
+            <button type="submit">Sign In</button>
+        </form>
+        <?php if($error) echo "<p class='error'>$error</p>"; ?>
+    </div>
+</div>
+</body>
+</html>
