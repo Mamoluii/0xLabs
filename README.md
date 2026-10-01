@@ -2,7 +2,6 @@
 
 A deliberately vulnerable e-commerce web app (**ByteStore**) built to practice web security concepts hands-on. Every lab ships **two versions side by side** — a `vulnerable` one and a `secure` one — so you can run the same exploit against both and see exactly what the fix changes.
 
-> ⚠️ **Educational use only.** This app is intentionally insecure. Never deploy it on a public server or reuse this code in a real project.
 
 ---
 
